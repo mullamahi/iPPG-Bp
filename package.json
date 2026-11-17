@@ -1,0 +1,20 @@
+{
+  "name": "ippg-bp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Browser-only webcam heart-rate estimation with MediaPipe face tracking and remote PPG signal processing.",
+  "scripts": {
+    "start": "npx --yes serve .",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "author": "mullamahi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mullamahi/iPPG-Bp.git"
+  },
+  "homepage": "https://github.com/mullamahi/iPPG-Bp"
+}
