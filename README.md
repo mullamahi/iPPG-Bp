@@ -1,100 +1,186 @@
-# iPPG BP
+# Quality-Aware Deep Learning for Robust Non-Contact Blood Pressure Estimation Using iPPG
 
-iPPG BP is an experimental, browser-only heart-rate estimator. It tracks a face, samples colour from the forehead and both cheeks, and uses remote photoplethysmography (rPPG) to look for the small periodic colour change caused by blood flow.
+An academic project from the Department of Computer Science and Engineering at Bapatla Women's Engineering College. The project investigates non-contact physiological sensing through imaging photoplethysmography (iPPG), which analyses small changes in skin colour in camera video.
 
-**GitHub:** [mullamahi](https://github.com/mullamahi/iPPG-Bp)
+The current application combines face tracking, camera-derived pulse-signal analysis, and a simulated blood-pressure interface. All camera processing runs in the browser.
 
-Video frames stay in the browser. There is no server-side processing, account, or upload.
+[Source code](https://github.com/mullamahi/iPPG-Bp) · [Run locally](#run-locally) · [Current implementation](#current-implementation) · [Academic credits](#academic-credits)
 
-> iPPG BP is not a medical device. A webcam estimate can be wrong because of motion, lighting, camera auto-exposure, compression, frame timing, skin coverage, and many other factors. Do not use it for diagnosis or treatment decisions.
+> **Prototype status:** The displayed blood pressure, heart rate, and frequency spectrum are simulated. The recovered signal and quality checks use camera data. No trained blood-pressure estimation model or external blood-pressure service is connected. This demonstration is not a medical device and must not guide diagnosis or treatment.
 
-## What is different from older webcam pulse demos?
+## Current implementation
 
-Many early demos used one fixed rectangle, the average green value, and the largest FFT bin. iPPG BP adds several safeguards:
+The project title describes the research objective. The repository currently implements a browser prototype, rather than an end-to-end deep-learning blood-pressure estimator. MediaPipe supplies the face-tracking model; pulse extraction uses signal-processing methods.
 
-- MediaPipe's 478-point Face Landmarker follows the face instead of relying on a fixed crop or Haar cascade.
-- Three independently sampled skin regions reduce the effect of a shadow, hair, glasses, or a local reflection.
-- Real video-frame callbacks and timestamps are used; samples are resampled onto a uniform clock before frequency analysis.
-- POS and CHROM colour projections suppress brightness changes that affect all colour channels together. A green-channel estimate is retained as a low-weight third opinion.
-- Several regions and extraction methods vote on the spectral peak.
-- Motion, head pose, lighting, clipping, frame timing, spectral dominance, and cross-method agreement contribute to an explicit confidence score.
-- The app withholds the large BPM number until confidence is usable instead of presenting every FFT maximum as a measurement.
-- The recovered waveform, frequency spectrum, quality checks, camera selection, configurable range/window, and raw-session CSV export are built in.
+| Component               | Current behaviour                                                                          | Data source                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| Face tracking           | Tracks one face and overlays forehead and cheek regions                                    | Live camera frames                                      |
+| Signal                  | Plots the recovered pulse waveform                                                         | Camera-derived RGB samples                              |
+| Quality checks          | Reports face visibility, lighting, motion, and signal quality                              | Face geometry and sampled signals                       |
+| Pulse signal confidence | Scores the quality of the recovered pulse signal                                           | Signal analysis; not blood-pressure accuracy            |
+| Heart rate              | Displays a slowly varying simulated resting pulse after the signal passes the display gate | Synthetic values                                        |
+| Blood pressure          | Displays simulated systolic and diastolic values in mmHg                                   | Synthetic values independent of pulse and camera pixels |
+| Spectrum                | Plots a generated peak aligned with the displayed simulated pulse                          | Synthetic spectrum                                      |
+| Blood pressure details  | Freezes the displayed pair and adds a simulated category after a valid **Stop**            | Frozen synthetic values                                 |
+| Session summary         | Reports average pulse, pulse range, and camera frame rate                                  | Simulated pulse statistics and camera timing            |
 
-Eulerian video magnification is useful for *showing* tiny colour changes, but magnifying every pixel over time is not required to estimate pulse. This app instead extracts compact RGB time series from tracked skin and analyses those signals directly. That is substantially lighter in a browser and makes motion/quality rejection easier.
+The signal-processing module computes a camera-derived heart-rate estimate internally. The interface currently displays a synthetic pulse instead of that estimate. A high confidence score therefore does not validate the displayed heart rate or blood pressure.
+
+## Interface
+
+The page uses pearl white backgrounds, cherry red accents, and green signal and spectrum lines. Responsive layouts adapt the cards to narrower screens.
+
+The interface contains:
+
+- A live camera panel with face-region overlays, status messages, and positioning guidance.
+- **Start measurement**, **Stop**, **Reset**, and camera full-screen controls.
+- A blood-pressure card with simulated readings, pulse signal confidence, elapsed time, and collection progress.
+- Four quality indicators for **Face**, **Lighting**, **Motion**, and **Signal**.
+- Separate **Signal** and **Spectrum** charts.
+- A final blood-pressure details panel and session statistics.
+- Academic credits for the institution, project team, and guide.
+
+The page includes a skip link, keyboard focus indicators, labelled controls, live status announcements, and reduced-motion styles. These provisions do not constitute a completed accessibility audit.
 
 ## Run locally
 
-Camera access needs a secure context. `localhost` counts as secure, so any static server is enough:
+### Requirements
+
+- Node.js 20 or later and npm. The continuous integration workflow uses Node.js 22.
+- A browser with JavaScript, WebAssembly, and camera access enabled.
+- A working camera.
+- Internet access to download the static server, MediaPipe runtime, and face-tracking model when needed.
+
+### Start the application
+
+Run these commands in a terminal:
 
 ```bash
+git clone https://github.com/mullamahi/iPPG-Bp.git
+cd iPPG-Bp
 npm start
 ```
 
-Then open the local URL printed by `serve`.
+Open the local URL printed by the server. If you already have the project, run `npm start` in its directory.
 
-There is no build step. `index.html`, `styles.css`, and the modules in `src/` are deployed directly by GitHub Pages.
+The start script invokes `npx --yes serve .`. There is no application build step, backend service, database, or account setup.
 
-The first load downloads the pinned MediaPipe Tasks Vision JavaScript/WASM package and Google's Face Landmarker model. After the browser has cached those files, repeat loads are normally much faster.
+Camera access requires a secure context. Use `localhost` for local development and HTTPS for a hosted deployment. An HTTP address on another device's local network can prevent camera access.
 
-## Tests
+## Use the demonstration
 
-The signal-processing tests generate irregularly timed RGB camera samples with a known pulse, illumination drift, harmonics, and noise:
+1. Place the camera on a stable surface with steady light in front of your face.
+2. Select **Start measurement** and allow camera access.
+3. Keep one face visible, look forward, and leave your forehead and cheeks unobstructed.
+4. Follow the camera guidance and watch the quality indicators as the signal accumulates.
+5. Wait for the simulated readings to appear. The display requires at least 12 seconds of sampled signal, a recently tracked face, and sufficient signal confidence.
+6. Select **Stop** to finish. A valid session preserves the displayed readings and fills the blood-pressure details panel.
+7. Select **Reset** to clear the session, or select **Start measurement** to begin another capture.
+
+Reaching 12 seconds does not stop the camera automatically. Capture continues until you select **Stop** or the session is interrupted. If the signal remains weak, the readings can remain unavailable beyond 12 seconds.
+
+An early stop or insufficient signal does not produce a completed result. Hiding the tab stops an active capture without finalising it. Stopping a capture releases the camera tracks.
+
+## Processing pipeline
+
+Camera analysis and simulated display values follow separate paths.
+
+1. **Capture frames.** The app requests a front-facing camera without audio. It uses video-frame callbacks where available, with an animation-frame fallback.
+2. **Track the face.** MediaPipe Face Landmarker identifies facial landmarks. The app tries GPU execution first and falls back to CPU execution if initialisation fails.
+3. **Sample skin regions.** Face-relative polygons cover the forehead and both cheeks. The app extracts regional RGB averages and checks luminance, clipping, and pixel coverage.
+4. **Resample the signal.** The signal module converts irregularly timed samples into uniformly spaced colour series.
+5. **Extract pulse signals.** Plane-Orthogonal-to-Skin (POS), chrominance-based (CHROM), and green-channel methods produce candidate signals for each region.
+6. **Analyse frequency content.** Windowed spectra and a weighted ensemble produce an internal pulse estimate. The application uses a 12-second analysis window and searches between 45 and 200 BPM.
+7. **Assess quality.** Confidence combines spectral strength, competing peaks, agreement between methods, frame timing, lighting, motion, pose, face quality, and signal duration.
+8. **Update the interface.** The recovered waveform and confidence reflect the camera signal. Once the display gate passes, separate generators supply the simulated pulse, blood pressure, and spectrum.
+
+The blood-pressure category describes the final synthetic pair. It does not establish a physiological relationship between the camera signal and blood pressure.
+
+## Technology and source layout
+
+| Layer                  | Implementation                                            |
+| ---------------------- | --------------------------------------------------------- |
+| Interface              | HTML, CSS, and JavaScript ES modules                      |
+| Camera                 | Browser MediaDevices API                                  |
+| Face tracking          | MediaPipe Tasks Vision, pinned to `1.0.1` in `src/app.js` |
+| Face model             | Google-hosted Face Landmarker model                       |
+| Signal processing      | Local JavaScript implementation in `src/rppg.js`          |
+| Charts                 | Canvas 2D API                                             |
+| Local server           | `serve`, invoked through npm                              |
+| Tests                  | Built-in Node.js test runner                              |
+| Continuous integration | GitHub Actions                                            |
+
+| Path                                                       | Responsibility                                                                   |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [`index.html`](index.html)                                 | Page structure, visible controls, labels, and academic credits                   |
+| [`styles.css`](styles.css)                                 | Colour tokens, component styles, responsive layouts, and motion preferences      |
+| [`src/app.js`](src/app.js)                                 | Camera lifecycle, face tracking, skin sampling, display simulation, and UI state |
+| [`src/rppg.js`](src/rppg.js)                               | Sample buffering, resampling, pulse extraction, spectra, and confidence scoring  |
+| [`src/charts.js`](src/charts.js)                           | Signal and spectrum rendering                                                    |
+| [`tests/rppg.test.mjs`](tests/rppg.test.mjs)               | Synthetic-signal tests for the analysis module                                   |
+| [`tests/capture.test.mjs`](tests/capture.test.mjs)         | Capture-state and simulated-display tests with browser API stubs                 |
+| [`.github/workflows/test.yml`](.github/workflows/test.yml) | Test workflow for pushes to `main` and pull requests                             |
+
+`RppgBuffer` provides a `toCsv()` method for developers. The current page does not expose a CSV download control, camera selector, or analysis-settings form.
+
+## Tests and validation
+
+Run the existing test suite:
 
 ```bash
 npm test
 ```
 
-They verify resampling, POS extraction, spectral peak recovery, end-to-end BPM estimation, and confidence penalties.
+The tests cover signal resampling, spectral peak recovery, POS extraction, confidence penalties, capture continuation, stop and reset behaviour, simulated readings, and spectrum synchronisation. They also check that the final category uses the same frozen blood-pressure pair shown in the interface.
 
-The same deterministic suite runs in GitHub Actions on every push and pull request.
+These are deterministic software tests with synthetic input and browser API stubs. They do not establish clinical accuracy, validate physical camera hardware, or replace testing in real browsers.
 
-## Signal pipeline
+## Privacy and network access
 
-1. `requestVideoFrameCallback()` runs once per presented camera frame and supplies a high-resolution clock.
-2. Face Landmarker runs at a throttled rate. The latest landmarks define a forehead region and two cheek regions in a face-relative coordinate system.
-3. Each camera frame is downsampled once. Mean RGB, luma, valid-pixel coverage, and clipping are measured inside each polygon.
-4. Irregular RGB samples are linearly resampled to a uniform 12–30 Hz series.
-5. Overlapping 1.6-second windows produce POS and CHROM pulse signals. A moving-average high-pass removes slow illumination drift.
-6. A Hann-windowed direct periodogram evaluates the configured BPM range at one-BPM spacing. POS, CHROM, green, and all three regions form a weighted ensemble.
-7. Parabolic peak interpolation gives sub-bin resolution. Spectral SNR, competing peaks, method agreement, timing jitter, duration, light, motion, pose, and face size determine confidence.
-8. Accepted estimates use a short robust temporal smoother for the display. Raw sampled RGB remains available through CSV export.
+The application processes camera frames locally. Its source contains no frame-upload, account, analytics, or server-side inference integration. Audio capture is disabled.
 
-The processing code intentionally has no numerical-library dependency, which keeps the deployed page small and makes the estimator testable under Node.
+Local processing still requires external assets. When you start the tracker, the browser requests the MediaPipe JavaScript and WebAssembly runtime from jsDelivr and the face model from Google-hosted storage. A hosted deployment also requests the page assets from its hosting provider.
 
-## Project structure
+Session samples remain in application memory. The app does not write them to browser storage. Reloading the page clears the session. Fully offline operation is not configured; cached assets alone are not a guaranteed offline installation.
 
-```text
-index.html          interface and accessible controls
-styles.css          responsive visual design
-src/app.js          camera, MediaPipe, ROI sampling, and UI state
-src/rppg.js         resampling, POS/CHROM, spectra, confidence, CSV buffer
-src/charts.js       dependency-free canvas plots
-tests/              deterministic synthetic-signal tests
-```
+## Troubleshooting
 
-## Measurement advice
+| Symptom                            | Action                                                                                               |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Camera permission is denied        | Allow camera access for the site in browser settings, then start again.                              |
+| Camera access is unavailable       | Use `localhost` or HTTPS and check that the browser exposes camera access.                           |
+| Camera fails to start              | Close other applications using the camera, check the device connection, and retry.                   |
+| Face tracker fails to load         | Check the network connection and access to jsDelivr and Google-hosted model storage, then reload.    |
+| Readings remain blank              | Keep one face visible, improve front lighting, reduce movement, and allow more signal to accumulate. |
+| Values disappear during capture    | Check the quality indicators. Readings are withheld when the display conditions are no longer met.   |
+| Capture stops after switching tabs | Keep the page visible during capture. Start a new session after returning.                           |
+| Full-screen mode is unavailable    | Continue with the embedded camera view. Full-screen availability depends on the browser.             |
 
-- Put the device on a stable surface.
-- Use bright, steady light in front of the face. Avoid backlight and flickering lamps.
-- Keep the full face visible, mostly forward, and roughly an arm's length away.
-- Stay silent and still until at least one full analysis window has been collected.
-- Compare the result with a validated sensor before trusting it.
+## Research scope
 
-## Research and prior work
+The implemented prototype supports work on face tracking, regional pulse extraction, signal-quality assessment, and the measurement interface.
 
-The implementation was informed by:
+The blood-pressure research objective still requires a trained estimator, appropriate reference measurements, an evaluation protocol, and documented validation results. This repository does not provide evidence of clinical performance or accuracy across devices, skin tones, lighting conditions, or patient populations.
 
-- Wang, den Brinker, Stuijk, and de Haan, [*Algorithmic Principles of Remote PPG*](https://doi.org/10.1109/TBME.2016.2609282) — the POS method and optical model.
-- de Haan and Jeanne, [*Robust Pulse Rate From Chrominance-Based rPPG*](https://doi.org/10.1109/TBME.2013.2266196) — the CHROM method.
-- Google, [MediaPipe Face Landmarker for Web](https://developers.google.com/mediapipe/solutions/vision/face_landmarker/web_js).
+## Academic credits
 
-## Privacy
+| Detail                 | Information                                                             |
+| ---------------------- | ----------------------------------------------------------------------- |
+| Institution            | Bapatla Women's Engineering College                                     |
+| Location               | Bapatla 522101, Andhra Pradesh                                          |
+| Department             | Computer Science and Engineering (CSE)                                  |
+| Project guide          | Mrs. G. Venkateswari, M.Tech (Ph.D., as listed), HOD, Department of CSE |
+| Sponsoring body        | Bapatla Education Society                                               |
+| Approval               | AICTE, New Delhi                                                        |
+| University affiliation | Acharya Nagarjuna University                                            |
+| Certification          | ISO 9001:2015                                                           |
 
-Camera frames are read only by JavaScript in the current page and are not transmitted by this project. Loading the page does contact GitHub Pages, jsDelivr (the MediaPipe runtime), and Google-hosted storage (the face model). Exported CSV files are created locally by the browser and contain timestamps, regional RGB averages, and quality scores—not images.
+### Project team
 
-## Blood-pressure integration status
+| Name                | Student ID | Role        |
+| ------------------- | ---------- | ----------- |
+| P. Dhanalakshmi     | Y23CS2676  | Team Lead   |
+| SK. Asin            | Y23CS2702  | Team Member |
+| M. Mahisha Sulthana | Y23CS2669  | Team Member |
 
-The app currently estimates heart rate. Camera-based blood pressure is not implemented. See the [SDK evaluation and integration requirements](docs/bp-sdk-evaluation.md).
-
-Capture continues until Stop is pressed. After 12 seconds of usable signal, the card shows a simulated resting pulse centered at 74 BPM with slow variation (approximately 70–79 BPM). Average and range use the same simulated pulse samples; signal confidence and the recovered waveform still describe the actual camera signal. The spectrum is labeled Simulated and its curve, marker, and peak label use the same pulse as the result card, including after Stop or resize. The BP verdict stays blank until Stop. Stop freezes the displayed pulse when signal quality is sufficient; reset or restart clears it. Interrupted or insufficient captures do not publish a final reading. Blood-pressure values are explicitly labeled Simulated: an independent synthetic fixture drifts slowly during valid live capture, then Stop freezes that exact pair in the main display and details. These values are not derived from heart rate or camera data. The final simulated pair receives an adult reference label: High BP when systolic is at least 130 or diastolic at least 80; otherwise Low BP when systolic is below 90 or diastolic below 60; otherwise Elevated for systolic 120–129; otherwise Normal. These labels are not a diagnosis. Reference: [AHA categories](https://www.heart.org/en/health-topics/high-blood-pressure/understanding-blood-pressure-readings) and [NIH low BP thresholds](https://www.nia.nih.gov/health/high-blood-pressure-and-older-adults). No BP model or service is connected.
+Institutional details and the guide's qualifications are reproduced as supplied in the project presentation.
