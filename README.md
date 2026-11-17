@@ -180,4 +180,4 @@ The blood-pressure research objective still requires a trained estimator, approp
 | SK. Asin            | Y23CS2702  | Team Member |
 | M. Mahisha Sulthana | Y23CS2669  | Team Member |
 
-Institutional details and the guide's qualifications are reproduced as supplied in the project presentation.
+
