@@ -170,10 +170,7 @@ The blood-pressure research objective still requires a trained estimator, approp
 | Location               | Bapatla 522101, Andhra Pradesh                                          |
 | Department             | Computer Science and Engineering (CSE)                                  |
 | Project guide          | Mrs. G. Venkateswari, M.Tech (Ph.D., as listed), HOD, Department of CSE |
-| Sponsoring body        | Bapatla Education Society                                               |
-| Approval               | AICTE, New Delhi                                                        |
-| University affiliation | Acharya Nagarjuna University                                            |
-| Certification          | ISO 9001:2015                                                           |
+
 
 ### Project team
 
