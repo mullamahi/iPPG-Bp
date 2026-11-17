@@ -6,7 +6,7 @@ import {
   estimateHeartRate,
   extractProjectionSignal,
   resampleSeries,
-} from "../src/rppg.js";
+} from "../src/ippg.js";
 
 test("resampleSeries interpolates irregular samples onto a uniform clock", () => {
   const result = resampleSeries([0, 0.4, 1], [0, 4, 10], 2, 0, 1);

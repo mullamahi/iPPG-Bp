@@ -19,7 +19,7 @@ function app() {
     window: { addEventListener() {} }, navigator: {},
     performance: { now: () => 13000 }, HTMLVideoElement: { prototype: {} },
     clearInterval() {}, cancelAnimationFrame() {}, requestAnimationFrame() { return 1; }, console,
-    RppgBuffer: class { duration = 12; clear() {} recent() { return []; } },
+    IppgBuffer: class { duration = 12; clear() {} recent() { return []; } },
     estimateHeartRate: () => ({ bpm: 72, confidence: 0.9, duration: 12, fps: 30, waveform: [], spectrum: {}, diagnostics: {} }),
     clearCharts() {}, drawSignalChart() {},
     drawSpectrumChart(canvas, spectrum, peak) { canvas.renderedSpectrum = spectrum; canvas.peakBpm = peak; },

@@ -104,7 +104,7 @@ The blood-pressure category describes the final synthetic pair. It does not esta
 | Camera                 | Browser MediaDevices API                                  |
 | Face tracking          | MediaPipe Tasks Vision, pinned to `1.0.1` in `src/app.js` |
 | Face model             | Google-hosted Face Landmarker model                       |
-| Signal processing      | Local JavaScript implementation in `src/rppg.js`          |
+| Signal processing      | Local JavaScript implementation in `src/ippg.js`          |
 | Charts                 | Canvas 2D API                                             |
 | Local server           | `serve`, invoked through npm                              |
 | Tests                  | Built-in Node.js test runner                              |
@@ -115,13 +115,13 @@ The blood-pressure category describes the final synthetic pair. It does not esta
 | [`index.html`](index.html)                                 | Page structure, visible controls, labels, and academic credits                   |
 | [`styles.css`](styles.css)                                 | Colour tokens, component styles, responsive layouts, and motion preferences      |
 | [`src/app.js`](src/app.js)                                 | Camera lifecycle, face tracking, skin sampling, display simulation, and UI state |
-| [`src/rppg.js`](src/rppg.js)                               | Sample buffering, resampling, pulse extraction, spectra, and confidence scoring  |
+| [`src/ippg.js`](src/ippg.js)                               | Sample buffering, resampling, pulse extraction, spectra, and confidence scoring  |
 | [`src/charts.js`](src/charts.js)                           | Signal and spectrum rendering                                                    |
-| [`tests/rppg.test.mjs`](tests/rppg.test.mjs)               | Synthetic-signal tests for the analysis module                                   |
+| [`tests/ippg.test.mjs`](tests/ippg.test.mjs)               | Synthetic-signal tests for the analysis module                                   |
 | [`tests/capture.test.mjs`](tests/capture.test.mjs)         | Capture-state and simulated-display tests with browser API stubs                 |
 | [`.github/workflows/test.yml`](.github/workflows/test.yml) | Test workflow for pushes to `main` and pull requests                             |
 
-`RppgBuffer` provides a `toCsv()` method for developers. The current page does not expose a CSV download control, camera selector, or analysis-settings form.
+`IppgBuffer` provides a `toCsv()` method for developers. The current page does not expose a CSV download control, camera selector, or analysis-settings form.
 
 ## Tests and validation
 

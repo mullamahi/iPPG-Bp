@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f8f6f2" />
     <meta name="color-scheme" content="light" />
-    <meta name="description" content="Private, browser-based remote heart-rate estimation using face tracking and rPPG signal analysis." />
+    <meta name="description" content="Private, browser-based remote heart-rate estimation using face tracking and iPPG signal analysis." />
     <meta name="referrer" content="no-referrer" />
     <title>iPPG BP — webcam heart-rate experiment</title>
     <link rel="icon" href="project_logo.png" type="image/png" />
@@ -106,7 +106,6 @@
           <div class="bp-reading-display" id="bpDisplay" aria-label="Simulated blood pressure not available">
             <div class="bp-reading-value"><span id="systolicValue">—</span><span>/</span><span id="diastolicValue">—</span></div>
             <div class="bpm-unit">mmHg · Simulated</div>
-            <p class="bp-verdict-note">Generated values, not measured blood pressure.</p>
           </div>
           <div class="live-pulse-row" id="bpmDisplay" data-ready="false">
             <span>Heart rate · Simulated</span>
@@ -164,6 +163,7 @@
               <strong id="bpVerdict" aria-describedby="bpVerdictReason"></strong>
             </div>
             <p id="bpVerdictReason" class="bp-verdict-note" role="status"></p>
+            <a class="bp-category-source" href="https://www.heart.org/en/health-topics/high-blood-pressure/understanding-blood-pressure-readings" target="_blank" rel="noopener noreferrer">AHA reference: Understanding Blood Pressure Readings (opens in a new tab)</a>
           </section>
 
           <div class="session-summary" aria-label="Simulated pulse session statistics and camera frame rate">

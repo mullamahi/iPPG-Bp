@@ -1,6 +1,6 @@
 const EPSILON = 1e-9;
 
-export const DEFAULT_RPPG_OPTIONS = Object.freeze({
+export const DEFAULT_IPPG_OPTIONS = Object.freeze({
   minBpm: 45,
   maxBpm: 200,
   windowSeconds: 12,
@@ -8,7 +8,7 @@ export const DEFAULT_RPPG_OPTIONS = Object.freeze({
   spectrumStepBpm: 1,
 });
 
-export class RppgBuffer {
+export class IppgBuffer {
   constructor(maxDurationSeconds = 25) {
     this.maxDurationSeconds = maxDurationSeconds;
     this.samples = [];
@@ -488,7 +488,7 @@ function indexOfMax(values) {
 }
 
 function normalizeOptions(userOptions) {
-  const options = { ...DEFAULT_RPPG_OPTIONS, ...userOptions };
+  const options = { ...DEFAULT_IPPG_OPTIONS, ...userOptions };
   options.minBpm = clamp(Number(options.minBpm), 35, 180);
   options.maxBpm = clamp(Number(options.maxBpm), options.minBpm + 20, 240);
   options.windowSeconds = clamp(Number(options.windowSeconds), 8, 30);

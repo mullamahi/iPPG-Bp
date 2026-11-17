@@ -1,4 +1,4 @@
-import { RppgBuffer, estimateHeartRate } from "./rppg.js";
+import { IppgBuffer, estimateHeartRate } from "./ippg.js";
 import { clearCharts, drawSignalChart, drawSpectrumChart } from "./charts.js";
 
 const MEDIAPIPE_VERSION = "1.0.1";
@@ -51,7 +51,7 @@ const elements = {
 const overlayContext = elements.overlay.getContext("2d");
 const sampleCanvas = document.createElement("canvas");
 const sampleContext = sampleCanvas.getContext("2d", { willReadFrequently: true });
-const buffer = new RppgBuffer(32);
+const buffer = new IppgBuffer(32);
 
 const state = {
   running: false,
